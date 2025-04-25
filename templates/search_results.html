@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}نتائج البحث - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('search') }}">بحث</a></li>
+                <li class="breadcrumb-item active" aria-current="page">نتائج البحث</li>
+            </ol>
+        </nav>
+        
+        <h1 class="mb-4">نتائج البحث</h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="{{ url_for('search') }}" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="query" class="form-label">كلمات البحث</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="query" name="query" value="{{ query }}" placeholder="بحث عن عنوان، فنان، وصف...">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>بحث
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">تصنيف</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">جميع التصنيفات</option>
+                                <option value="مارش عسكري" {% if category == 'مارش عسكري' %}selected{% endif %}>مارش عسكري</option>
+                                <option value="موسيقى احتفالية" {% if category == 'موسيقى احتفالية' %}selected{% endif %}>موسيقى احتفالية</option>
+                                <option value="استعراض عسكري" {% if category == 'استعراض عسكري' %}selected{% endif %}>استعراض عسكري</option>
+                                <option value="سلام وطني" {% if category == 'سلام وطني' %}selected{% endif %}>سلام وطني</option>
+                                <option value="مراسم رسمية" {% if category == 'مراسم رسمية' %}selected{% endif %}>مراسم رسمية</option>
+                                <option value="أخرى" {% if category == 'أخرى' %}selected{% endif %}>أخرى</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    نتائج البحث
+                    {% if query %}عن "{{ query }}"{% endif %}
+                    {% if category %}في تصنيف "{{ category }}"{% endif %}
+                </h5>
+                <span class="badge bg-primary">{{ results|length }} نتيجة</span>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                <div class="row">
+                    {% for file in results %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            {% if file.plot_path %}
+                            <img src="{{ url_for('static', filename=file.plot_path.replace('static/', '')) }}" class="card-img-top" alt="{{ file.title }}">
+                            {% else %}
+                            <div class="card-img-top bg-light text-center py-5">
+                                <i class="fas fa-music fa-4x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ file.title }}</h5>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>{{ file.artist or 'غير معروف' }}<br>
+                                        <i class="fas fa-tag me-1"></i>{{ file.category or 'غير مصنف' }}
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <span class="badge bg-info me-1">{{ file.mood or 'غير محدد' }}</span>
+                                    <span class="badge bg-secondary">{{ "%.1f"|format(file.tempo or 0) }} BPM</span>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="{{ url_for('file_details', file_id=file.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-info-circle me-1"></i>التفاصيل
+                                </a>
+                                <a href="{{ url_for('analyze_file', file_id=file.id) }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-chart-bar me-1"></i>التحليل
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>لم يتم العثور على نتائج. جرب استخدام كلمات بحث مختلفة أو قم بتصفية النتائج بطريقة أخرى.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}تحليل {{ music_file.title }} - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css">
+<style>
+    .feature-card {
+        transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('file_details', file_id=music_file.id) }}">{{ music_file.title }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">التحليل المفصل</li>
+            </ol>
+        </nav>
+        
+        <h1 class="mb-4">تحليل مفصل لـ "{{ music_file.title }}"</h1>
+        
+        {% if features.individual_performance_quality is none or features.responsiveness_to_conducting is none %}
+        <div class="alert alert-warning">
+            بعض المقاييس (جودة الأداء الفردي أو الاستجابة لتوجيه القائد) غير قابلة للقياس من التسجيل الصوتي المشترك.
+        </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <a href="{{ url_for('export_csv', file_id=music_file.id) }}" class="btn btn-outline-primary">تصدير CSV</a>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-drumstick fa-3x text-primary mb-3"></i>
+                        <h3>{{ "%.1f"|format(features.tempo or 0) }}</h3>
+                        <h5>الإيقاع (BPM)</h5>
+                        <p class="text-muted">
+                            {% if features.tempo < 70 %}
+                                إيقاع بطيء مناسب للمراسم الوقورة
+                            {% elif features.tempo < 100 %}
+                                إيقاع متوسط مناسب للعروض الرسمية
+                            {% else %}
+                                إيقاع سريع مناسب للاستعراضات العسكرية
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-fire fa-3x text-danger mb-3"></i>
+                        <h3>{{ "%.2f"|format(features.energy or 0) }}</h3>
+                        <h5>الطاقة</h5>
+                        <p class="text-muted">
+                            {% if features.energy < 0.3 %}
+                                مستوى طاقة منخفض
+                            {% elif features.energy < 0.6 %}
+                                مستوى طاقة متوسط
+                            {% else %}
+                                مستوى طاقة مرتفع
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-sync fa-3x text-success mb-3"></i>
+                        <h3>{{ "%.2f"|format(features.rhythmic_regularity or 0) }}</h3>
+                        <h5>الانتظام الإيقاعي</h5>
+                        <p class="text-muted">
+                            {% if features.rhythmic_regularity < 0.4 %}
+                                انتظام منخفض
+                            {% elif features.rhythmic_regularity < 0.7 %}
+                                انتظام متوسط
+                            {% else %}
+                                انتظام عالي نموذجي للموسيقى العسكرية
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tachometer-alt fa-3x text-info mb-3"></i>
+                        <h3>{{ "%.2f"|format(features.rhythmic_precision or 0) }}</h3>
+                        <h5>الدقة الإيقاعية</h5>
+                        <p class="text-muted">
+                            {% if features.rhythmic_precision < 0.4 %} دقة منخفضة
+                            {% elif features.rhythmic_precision < 0.7 %} دقة متوسطة
+                            {% else %} دقة عالية
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-music fa-3x text-warning mb-3"></i>
+                        <h3>{{ "%.2f"|format(features.harmonic_cohesion or 0) }}</h3>
+                        <h5>التماسك الهارموني</h5>
+                        <p class="text-muted">
+                            {% if features.harmonic_cohesion < 0.4 %} تماسك منخفض
+                            {% elif features.harmonic_cohesion < 0.7 %} تماسك متوسط
+                            {% else %} تماسك عالي
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-random fa-3x text-success mb-3"></i>
+                        <h3>{{ "%.2f"|format(features.musical_diversity or 0) }}</h3>
+                        <h5>التنوع الموسيقي</h5>
+                        <p class="text-muted">
+                            {% if features.musical_diversity < 0.4 %} تنوع منخفض
+                            {% elif features.musical_diversity < 0.7 %} تنوع متوسط
+                            {% else %} تنوع عالي
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">مخطط خصائص الصوت</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ plot_url }}" alt="Radar Chart" class="img-fluid" />
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">تصنيف المقطوعة</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h5>نوع المارش:</h5>
+                            <h3 class="text-primary">{{ features.march_type or 'غير محدد' }}</h3>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5>المزاج / النمط:</h5>
+                            <h3 class="text-primary">{{ features.mood or 'غير محدد' }}</h3>
+                        </div>
+                        
+                        <p class="text-muted">
+                            هذا التصنيف مبني على تحليل الخصائص الصوتية للملف، بما في ذلك الإيقاع والطاقة والانتظام الإيقاعي والخصائص الطيفية.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">جميع الخصائص المستخرجة</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>الخاصية</th>
+                                <th>القيمة</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>الإيقاع (Tempo)</td>
+                                <td>{{ "%.2f"|format(features.tempo or 0) }} BPM</td>
+                                <td>سرعة الإيقاع الأساسي للمقطوعة</td>
+                            </tr>
+                            <tr>
+                                <td>الطاقة (Energy)</td>
+                                <td>{{ "%.3f"|format(features.energy or 0) }}</td>
+                                <td>مقياس لقوة وشدة الصوت</td>
+                            </tr>
+                            <tr>
+                                <td>الانتظام الإيقاعي</td>
+                                <td>{{ "%.3f"|format(features.rhythmic_regularity or 0) }}</td>
+                                <td>مدى انتظام وثبات الإيقاع</td>
+                            </tr>
+                            <tr>
+                                <td>المدة</td>
+                                <td>{{ "%.2f"|format(features.duration or 0) }} ثانية</td>
+                                <td>المدة الإجمالية للملف الصوتي</td>
+                            </tr>
+                            <tr>
+                                <td>مركز الطيف</td>
+                                <td>{{ "%.2f"|format(features.spectral_centroid_mean or 0) }}</td>
+                                <td>متوسط "مركز ثقل" الطيف الصوتي</td>
+                            </tr>
+                            <tr>
+                                <td>عرض النطاق الطيفي</td>
+                                <td>{{ "%.2f"|format(features.spectral_bandwidth_mean or 0) }}</td>
+                                <td>مقياس "عرض" الطيف الصوتي</td>
+                            </tr>
+                            <tr>
+                                <td>نقطة القطع الطيفي</td>
+                                <td>{{ "%.2f"|format(features.spectral_rolloff_mean or 0) }}</td>
+                                <td>التردد الذي يحتوي 85% من الطاقة الطيفية تحته</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">صورة مستوحاة باستخدام OpenAI</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if ai_image_url %}
+                            <img src="{{ ai_image_url }}" alt="AI Inspiration" class="img-fluid mb-3" />
+                            <p><small>النص المستخدم: "{{ prompt }}"</small></p>
+                        {% else %}
+                            <p class="text-muted">لم يتم إنشاء صورة AI.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-4">
+            <a href="{{ url_for('file_details', file_id=music_file.id) }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i>العودة إلى تفاصيل الملف
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Radar chart
+        // Removed chart code
+    });
+</script>
+{% endblock %}

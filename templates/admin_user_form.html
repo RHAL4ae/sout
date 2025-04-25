@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'إضافة مستخدم جديد' if not user else 'تعديل مستخدم' }} - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="fas {% if not user %}fa-user-plus{% else %}fa-user-edit{% endif %} me-2"></i>
+                    {{ 'إضافة مستخدم جديد' if not user else 'تعديل مستخدم' }}
+                </h3>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">اسم المستخدم</label>
+                            {{ form.username(class="form-control", placeholder="أدخل اسم المستخدم") }}
+                            {% for error in form.username.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            {{ form.email(class="form-control", placeholder="أدخل البريد الإلكتروني") }}
+                            {% for error in form.email.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">الاسم الكامل</label>
+                        {{ form.full_name(class="form-control", placeholder="أدخل الاسم الكامل") }}
+                        {% for error in form.full_name.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="rank" class="form-label">الرتبة العسكرية</label>
+                            {{ form.rank(class="form-control", placeholder="أدخل الرتبة العسكرية") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="unit" class="form-label">الوحدة/القطعة</label>
+                            {{ form.unit(class="form-control", placeholder="أدخل الوحدة/القطعة") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="access_level" class="form-label">مستوى الصلاحية</label>
+                        {{ form.access_level(class="form-select") }}
+                        {% for error in form.access_level.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                        
+                        <div class="form-text text-muted mt-2">
+                            <strong>مستويات الصلاحية:</strong><br>
+                            <span class="badge bg-secondary me-1">زائر</span> - الوصول للقراءة فقط للملفات العامة<br>
+                            <span class="badge bg-success me-1">أمين أرشيف</span> - يمكنه رفع الملفات وتعديل البيانات الوصفية<br>
+                            <span class="badge bg-info me-1">محلل</span> - يمكنه تحليل وإنشاء التقارير<br>
+                            <span class="badge bg-warning me-1">قائد</span> - وصول كامل بما في ذلك إدارة المستخدمين<br>
+                            <span class="badge bg-danger me-1">مدير النظام</span> - وصول كامل إلى جميع وظائف النظام
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <h5>كلمة المرور</h5>
+                    {% if user %}
+                    <p class="text-muted small">اترك الحقول فارغة إذا كنت لا ترغب في تغيير كلمة المرور</p>
+                    {% endif %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            {{ form.password(class="form-control", placeholder="أدخل كلمة المرور") }}
+                            {% for error in form.password.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password2" class="form-label">تأكيد كلمة المرور</label>
+                            {{ form.password2(class="form-control", placeholder="تأكيد كلمة المرور") }}
+                            {% for error in form.password2.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        {{ form.is_active(class="form-check-input") }}
+                        <label class="form-check-label" for="is_active">حساب نشط</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary me-md-2">إلغاء</a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

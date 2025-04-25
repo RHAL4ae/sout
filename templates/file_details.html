@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{{ music_file.title }} - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ music_file.title }}</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h1 class="mb-3">{{ music_file.title }}</h1>
+                        <div class="mb-3">
+                            <span class="badge bg-primary me-2">{{ music_file.category or 'غير مصنف' }}</span>
+                            <span class="badge bg-info me-2">{{ features.mood or 'غير محدد' }}</span>
+                            <span class="badge bg-secondary">{{ "%.1f"|format(features.tempo or 0) }} BPM</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p><strong>الفرقة / العازف:</strong> {{ music_file.artist or 'غير معروف' }}</p>
+                            <p><strong>نوع المارش:</strong> {{ features.march_type or 'غير محدد' }}</p>
+                            <p><strong>الكلمات المفتاحية:</strong> 
+                                {% if music_file.tags %}
+                                    {% for tag in music_file.tags.split(',') %}
+                                    <span class="badge bg-light text-dark me-1">{{ tag.strip() }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    لا توجد
+                                {% endif %}
+                            </p>
+                            <p><strong>تاريخ الإضافة:</strong> {{ music_file.upload_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% if music_file.description %}
+                                <p><strong>الوصف (manuel):</strong> {{ music_file.description }}</p>
+                            {% endif %}
+                            {% if music_file.ai_description %}
+                                <p><strong>الوصف (AI-generated):</strong> {{ music_file.ai_description }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4 ratio ratio-16x9">
+                            <audio controls class="w-100">
+                                <source src="{{ url_for('download_file', file_id=music_file.id) }}" type="audio/{{ music_file.file_type }}">
+                                متصفحك لا يدعم تشغيل الملفات الصوتية.
+                            </audio>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <a href="{{ url_for('download_file', file_id=music_file.id) }}" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-download me-1"></i>تحميل الملف
+                            </a>
+                            <a href="{{ url_for('analyze_file', file_id=music_file.id) }}" class="btn btn-outline-info">
+                                <i class="fas fa-chart-bar me-1"></i>عرض التحليل المفصل
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">مخطط الخصائص الصوتية</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                {% if music_file.plot_path %}
+                                <img src="{{ url_for('static', filename=music_file.plot_path.replace('static/', '')) }}" class="img-fluid" alt="تحليل {{ music_file.title }}">
+                                {% else %}
+                                <div class="alert alert-warning">
+                                    لا يوجد مخطط للتحليل
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">خصائص الملف</h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>الإيقاع</span>
+                                    <strong>{{ "%.1f"|format(features.tempo or 0) }} BPM</strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>الطاقة</span>
+                                    <strong>{{ "%.2f"|format(features.energy or 0) }}</strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>الانتظام الإيقاعي</span>
+                                    <strong>{{ "%.2f"|format(features.rhythmic_regularity or 0) }}</strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>المدة</span>
+                                    <strong>{{ "%.2f"|format(features.duration or 0) }} ثانية</strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>النمط الصوتي</span>
+                                    <strong>{{ features.mood or 'غير محدد' }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- AI Image Generation -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">صورة AI</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                {% if music_file.ai_image_path %}
+                                    <img src="{{ url_for('static', filename=music_file.ai_image_path) }}" alt="AI Image" class="img-fluid mb-3" />
+                                {% else %}
+                                    <form action="{{ url_for('generate_ai_image', file_id=music_file.id) }}" method="post">
+                                        <button type="submit" class="btn btn-outline-secondary">
+                                            <i class="fas fa-image me-1"></i>إنشاء صورة AI
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

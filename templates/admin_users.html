@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة المستخدمين - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-status-active {
+        color: #28a745;
+    }
+    .user-status-inactive {
+        color: #dc3545;
+    }
+    .access-badge {
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><i class="fas fa-users me-2"></i>إدارة المستخدمين</h3>
+        <a href="{{ url_for('add_user_admin') }}" class="btn btn-light">
+            <i class="fas fa-user-plus me-1"></i>إضافة مستخدم جديد
+        </a>
+    </div>
+    <div class="card-body">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم المستخدم</th>
+                        <th>الاسم الكامل</th>
+                        <th>الرتبة</th>
+                        <th>الوحدة</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>مستوى الصلاحية</th>
+                        <th>الحالة</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>آخر دخول</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.full_name }}</td>
+                        <td>{{ user.rank or '-' }}</td>
+                        <td>{{ user.unit or '-' }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.access_level.name == 'VISITOR' %}
+                                <span class="badge bg-secondary access-badge">زائر</span>
+                            {% elif user.access_level.name == 'ARCHIVIST' %}
+                                <span class="badge bg-success access-badge">أمين أرشيف</span>
+                            {% elif user.access_level.name == 'ANALYST' %}
+                                <span class="badge bg-info access-badge">محلل</span>
+                            {% elif user.access_level.name == 'COMMANDER' %}
+                                <span class="badge bg-warning text-dark access-badge">قائد</span>
+                            {% elif user.access_level.name == 'ADMIN' %}
+                                <span class="badge bg-danger access-badge">مدير النظام</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="user-status-active"><i class="fas fa-circle me-1"></i>نشط</span>
+                            {% else %}
+                                <span class="user-status-inactive"><i class="fas fa-circle me-1"></i>غير نشط</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-' }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('edit_user_admin', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                {% if current_user.id != user.id %}
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUser{{ user.id }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                
+                                <!-- Toggle user status button -->
+                                <a href="{{ url_for('toggle_user_status', user_id=user.id) }}" class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                    <i class="fas {% if user.is_active %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Delete Confirmation Modal -->
+                            <div class="modal fade" id="deleteUser{{ user.id }}" tabindex="-1" aria-labelledby="deleteUserLabel{{ user.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteUserLabel{{ user.id }}">تأكيد حذف المستخدم</h5>
+                                            <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            هل أنت متأكد من حذف المستخدم <strong>{{ user.username }}</strong>؟ لا يمكن التراجع عن هذا الإجراء.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                            <a href="{{ url_for('delete_user_admin', user_id=user.id) }}" class="btn btn-danger">حذف</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

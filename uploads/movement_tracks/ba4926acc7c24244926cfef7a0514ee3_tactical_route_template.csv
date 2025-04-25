@@ -1,0 +1,3 @@
+Waypoint_ID,Latitude,Longitude,Altitude_m,ETA_UTC,Action,Notes
+1,25.405,55.5136,50,2025-05-01T08:00:00Z,Observe,Initial observation
+2,25.406,55.514,55,2025-05-01T08:05:00Z,Secure,Secure perimeter

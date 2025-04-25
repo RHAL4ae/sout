@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}الملف الشخصي - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>بيانات المستخدم</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="avatar-circle mb-3">
+                    <span class="initials">{{ current_user.full_name[0] }}</span>
+                </div>
+                <h4>{{ current_user.full_name }}</h4>
+                <p class="text-muted">
+                    {% if current_user.rank %}
+                    <span class="badge bg-secondary me-1">{{ current_user.rank }}</span>
+                    {% endif %}
+                    {% if current_user.unit %}
+                    <span class="badge bg-info">{{ current_user.unit }}</span>
+                    {% endif %}
+                </p>
+                <p class="mb-1"><strong>اسم المستخدم:</strong> {{ current_user.username }}</p>
+                <p class="mb-1"><strong>البريد الإلكتروني:</strong> {{ current_user.email }}</p>
+                <p class="mb-1"><strong>مستوى الصلاحية:</strong> 
+                    {% if current_user.access_level.name == 'VISITOR' %}
+                        <span class="badge bg-secondary">زائر</span>
+                    {% elif current_user.access_level.name == 'ARCHIVIST' %}
+                        <span class="badge bg-success">أمين أرشيف</span>
+                    {% elif current_user.access_level.name == 'ANALYST' %}
+                        <span class="badge bg-info">محلل</span>
+                    {% elif current_user.access_level.name == 'COMMANDER' %}
+                        <span class="badge bg-warning text-dark">قائد</span>
+                    {% elif current_user.access_level.name == 'ADMIN' %}
+                        <span class="badge bg-danger">مدير النظام</span>
+                    {% endif %}
+                </p>
+                <p class="mb-1"><strong>تاريخ التسجيل:</strong> {{ current_user.created_at.strftime('%Y-%m-%d') }}</p>
+                {% if current_user.last_login %}
+                <p><strong>آخر تسجيل دخول:</strong> {{ current_user.last_login.strftime('%Y-%m-%d %H:%M') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-edit me-2"></i>تعديل البيانات الشخصية</h4>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('profile') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">{{ form.email.label }}</label>
+                        {{ form.email(class="form-control") }}
+                        {% for error in form.email.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">{{ form.full_name.label }}</label>
+                        {{ form.full_name(class="form-control") }}
+                        {% for error in form.full_name.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="rank" class="form-label">{{ form.rank.label }}</label>
+                            {{ form.rank(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="unit" class="form-label">{{ form.unit.label }}</label>
+                            {{ form.unit(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <h5>تغيير كلمة المرور</h5>
+                    <p class="text-muted small">اترك هذه الحقول فارغة إذا كنت لا ترغب في تغيير كلمة المرور</p>
+                    
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">{{ form.current_password.label }}</label>
+                        {{ form.current_password(class="form-control") }}
+                        {% for error in form.current_password.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="new_password" class="form-label">{{ form.new_password.label }}</label>
+                            {{ form.new_password(class="form-control") }}
+                            {% for error in form.new_password.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label">{{ form.confirm_password.label }}</label>
+                            {{ form.confirm_password(class="form-control") }}
+                            {% for error in form.confirm_password.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if current_user.access_level.value >= 20 %}
+        <div class="card shadow mt-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>إحصائيات المستخدم</h4>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 mb-3">
+                            <h2 class="text-primary">{{ uploads_count }}</h2>
+                            <p class="mb-0">الملفات المرفوعة</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 mb-3">
+                            <h2 class="text-success">{{ analyses_count }}</h2>
+                            <p class="mb-0">التحليلات المنجزة</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 mb-3">
+                            <h2 class="text-info">{{ last_activity_days }}</h2>
+                            <p class="mb-0">أيام منذ آخر نشاط</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if current_user.access_level.value >= 10 %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-music me-2"></i>آخر الملفات التي قمت برفعها</h4>
+            </div>
+            <div class="card-body">
+                {% if user_files %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>العنوان</th>
+                                <th>النوع</th>
+                                <th>التصنيف</th>
+                                <th>تاريخ الرفع</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in user_files %}
+                            <tr>
+                                <td>{{ file.title }}</td>
+                                <td>{{ file.file_type }}</td>
+                                <td>{{ file.category or 'غير مصنف' }}</td>
+                                <td>{{ file.upload_date.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <a href="{{ url_for('file_details', file_id=file.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    <a href="{{ url_for('analyze_file', file_id=file.id) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>لم تقم برفع أي ملفات بعد.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        background-color: var(--bs-primary);
+        border-radius: 50%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .initials {
+        font-size: 42px;
+        color: white;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

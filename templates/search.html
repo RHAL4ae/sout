@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}بحث - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="mb-4">البحث في الأرشيف</h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="{{ url_for('search') }}" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="query" class="form-label">كلمات البحث</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="query" name="query" placeholder="بحث عن عنوان، فنان، وصف...">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search me-1"></i>بحث
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">تصنيف</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">جميع التصنيفات</option>
+                                <option value="مارش عسكري">مارش عسكري</option>
+                                <option value="موسيقى احتفالية">موسيقى احتفالية</option>
+                                <option value="استعراض عسكري">استعراض عسكري</option>
+                                <option value="سلام وطني">سلام وطني</option>
+                                <option value="مراسم رسمية">مراسم رسمية</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">جميع الملفات في الأرشيف</h5>
+                <span id="file-count" class="badge bg-primary"></span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="files-table">
+                        <thead>
+                            <tr>
+                                <th>العنوان</th>
+                                <th>الفرقة / العازف</th>
+                                <th>التصنيف</th>
+                                <th>الإيقاع</th>
+                                <th>النمط</th>
+                                <th>تاريخ الإضافة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="files-list">
+                            <!-- سيتم تحميل البيانات هنا عبر JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="loading-indicator" class="text-center my-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-2">جاري تحميل الملفات...</p>
+                </div>
+                <div id="no-files" class="alert alert-info d-none">
+                    <i class="fas fa-info-circle me-2"></i>لا توجد ملفات في الأرشيف. قم برفع ملفات موسيقية للبدء.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filesList = document.getElementById('files-list');
+        const fileCount = document.getElementById('file-count');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const noFiles = document.getElementById('no-files');
+        
+        // Function to load all files
+        function loadFiles() {
+            // Simulating AJAX request for now
+            // In a real implementation, you would fetch data from the server
+            fetch('{{ url_for("index") }}')
+                .then(response => response.text())
+                .then(html => {
+                    // This is just a temporary solution for the prototype
+                    // In a real application, you would create a proper API endpoint
+                    
+                    // Simulate loading delay for demo purposes
+                    setTimeout(() => {
+                        loadingIndicator.classList.add('d-none');
+                        
+                        // Get files from the server
+                        const files = [
+                            {% for file in music_files %}
+                            {
+                                id: {{ file.id }},
+                                title: "{{ file.title }}",
+                                artist: "{{ file.artist or 'غير معروف' }}",
+                                category: "{{ file.category or 'غير مصنف' }}",
+                                tempo: {{ file.tempo or 0 }},
+                                mood: "{{ features.mood if features is defined else 'غير محدد' }}",
+                                uploadDate: "{{ file.upload_date.strftime('%Y-%m-%d') }}"
+                            },
+                            {% endfor %}
+                        ];
+                        
+                        if (files.length === 0) {
+                            noFiles.classList.remove('d-none');
+                            fileCount.textContent = '0 ملف';
+                        } else {
+                            fileCount.textContent = files.length + ' ملف';
+                            
+                            // Render files
+                            files.forEach(file => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td><a href="{{ url_for('file_details', file_id=0) }}".replace('0', file.id)>${file.title}</a></td>
+                                    <td>${file.artist}</td>
+                                    <td>${file.category}</td>
+                                    <td>${file.tempo.toFixed(1)} BPM</td>
+                                    <td>${file.mood}</td>
+                                    <td>${file.uploadDate}</td>
+                                    <td>
+                                        <a href="{{ url_for('file_details', file_id=0) }}".replace('0', file.id) class="btn btn-sm btn-outline-primary me-1" title="التفاصيل">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a href="{{ url_for('analyze_file', file_id=0) }}".replace('0', file.id) class="btn btn-sm btn-outline-info me-1" title="التحليل">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </a>
+                                        <a href="{{ url_for('download_file', file_id=0) }}".replace('0', file.id) class="btn btn-sm btn-outline-success" title="تحميل">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </td>
+                                `;
+                                filesList.appendChild(row);
+                            });
+                        }
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Error loading files:', error);
+                    loadingIndicator.classList.add('d-none');
+                    
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger';
+                    errorAlert.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>حدث خطأ أثناء تحميل الملفات. الرجاء تحديث الصفحة والمحاولة مرة أخرى.';
+                    
+                    filesList.parentElement.parentElement.appendChild(errorAlert);
+                });
+        }
+        
+        // Load files on page load
+        loadFiles();
+    });
+</script>
+{% endblock %}

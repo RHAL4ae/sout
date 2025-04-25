@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}500 - خطأ في الخادم{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="mt-5 mb-5">
+            <h1 class="display-1 text-muted">500</h1>
+            <h2 class="mb-4">عذراً، حدث خطأ في الخادم</h2>
+            <p class="lead mb-5">حدث خطأ أثناء معالجة طلبك. الرجاء المحاولة مرة أخرى لاحقاً أو الاتصال بمسؤول النظام إذا استمرت المشكلة.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>العودة إلى الصفحة الرئيسية
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

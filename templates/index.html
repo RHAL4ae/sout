@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}الرئيسية - أرشيف الموسيقى العسكرية الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card bg-light mb-4">
+            <div class="card-body">
+                <h1 class="text-primary mb-3">أرشيف الموسيقى العسكرية الذكي</h1>
+                <p class="lead">
+                    مرحباً بك في منصة الأرشفة والتحليل الذكي للموسيقى العسكرية. هذه المنصة تتيح لك إمكانية:
+                </p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <div class="card-body text-center">
+                                <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                                <h4>رفع وتخزين</h4>
+                                <p>رفع ملفات الموسيقى العسكرية بأنواعها المختلفة وتخزينها بشكل آمن</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                                <h4>تحليل وتصنيف</h4>
+                                <p>استخراج الخصائص الصوتية وتحليل الإيقاع والتصنيف الآلي للمقطوعات</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <div class="card-body text-center">
+                                <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                                <h4>بحث ذكي</h4>
+                                <p>البحث عن الملفات باستخدام الكلمات المفتاحية والخصائص الصوتية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('upload_file') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-upload me-2"></i>رفع ملف جديد
+                    </a>
+                    <a href="{{ url_for('upload_track') }}" class="btn btn-outline-secondary btn-lg ms-2">
+                        <i class="fas fa-file-csv me-2"></i>تكوين موسيقى تكتيكية
+                    </a>
+                    <a href="{{ url_for('search') }}" class="btn btn-outline-primary btn-lg ms-2">
+                        <i class="fas fa-search me-2"></i>البحث في الأرشيف
+                    </a>
+                    <a href="{{ url_for('generate_march_page') }}" class="btn btn-outline-success btn-lg ms-2">
+                        <i class="fas fa-music me-2"></i>توليد مارش
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if music_files %}
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <h2 class="mb-3">آخر الملفات المضافة</h2>
+        <div class="row">
+            {% for file in music_files[:6] %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if file.plot_path %}
+                    <img src="{{ url_for('static', filename=file.plot_path.replace('static/', '')) }}" class="card-img-top" alt="{{ file.title }}">
+                    {% else %}
+                    <div class="card-img-top bg-light text-center py-5">
+                        <i class="fas fa-music fa-4x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ file.title }}</h5>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ file.artist or 'غير معروف' }}<br>
+                                <i class="fas fa-tag me-1"></i>{{ file.category or 'غير مصنف' }}
+                            </small>
+                        </p>
+                        <p class="card-text">
+                            <span class="badge bg-info me-1">{{ file.mood or 'غير محدد' }}</span>
+                            <span class="badge bg-secondary">{{ "%.1f"|format(file.tempo or 0) }} BPM</span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ url_for('file_details', file_id=file.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-info-circle me-1"></i>التفاصيل
+                        </a>
+                        <a href="{{ url_for('analyze_file', file_id=file.id) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chart-bar me-1"></i>التحليل
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if music_files|length > 6 %}
+        <div class="text-center mt-3">
+            <a href="{{ url_for('search') }}" class="btn btn-outline-primary">
+                <i class="fas fa-th-list me-1"></i>عرض كافة الملفات ({{ music_files|length }})
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>لا توجد ملفات في الأرشيف بعد. قم برفع ملفات موسيقية للبدء.
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

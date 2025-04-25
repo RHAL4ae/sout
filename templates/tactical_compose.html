@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}تكوين موسيقى تكتيكية{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">مسار: {{ track.name }}</h2>
+<p>تم إنشاء ملف MIDI بنجاح:</p>
+<div class="mb-3">
+  <a href="{{ url_for('static', filename='music/' + midi_filename) }}" class="btn btn-success">
+    <i class="fas fa-download me-1"></i>تحميل MIDI
+  </a>
+</div>
+<audio controls>
+  <source src="{{ url_for('static', filename='music/' + midi_filename) }}" type="audio/midi">
+  متصفحك لا يدعم تشغيل صوت MIDI مباشرة.
+</audio>
+{% endblock %}

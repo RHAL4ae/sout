@@ -1,0 +1,3 @@
+Segment_ID,Phase,Start_Time_UTC,Duration_s,Mood,Tempo_BPM,Key_Signature,Instrumentation,Intensity,Action_Cue,Notes
+1,Infiltration,2025-05-01T08:00:00Z,30,Tense,90,A Minor,"Strings, Percussion",Medium,Soft Ostinato,Background tension build
+2,Engagement,2025-05-01T08:00:30Z,45,Aggressive,120,C Minor,"Brass, Drums, Strings",High,Staccato Hits,Rhythmic assault sequence

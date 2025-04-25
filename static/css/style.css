@@ -1,0 +1,261 @@
+/* 
+ * أرشيف الموسيقى العسكرية الذكي
+ * النمط الرئيسي للتطبيق
+ */
+
+/* Fonts - Cairo Web Font for UI */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+
+/* General styles */
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Buttons and cards hover effects */
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Navbar styling */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+/* Footer styling */
+.footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Audio player styling */
+audio {
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* Badges styling */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.8em;
+    border-radius: 50rem;
+}
+
+/* Featured sections on home page */
+.feature-card {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card i {
+    font-size: 3rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+/* Custom colors for UAE Design System integration */
+:root {
+    --primary: #5c4e2c;
+    --primary-dark: #191918;
+    --primary-light: #a38d54;
+    --primary-hover: #e3d195;
+
+    --secondary: #a38d54;
+    --secondary-dark: #5c4e2c;
+    --secondary-light: #e3d195;
+
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    --light: #f8f9fa;
+    --dark: #000001;
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--secondary) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Table styling */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+/* Progress bars */
+.progress {
+    height: 12px;
+    border-radius: 50rem;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .display-1 {
+        font-size: 4rem;
+    }
+}
+
+/* Utility classes */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px;
+    width: 100%;
+}
+
+/* Logo styling */
+.app-logo {
+    max-height: 40px;
+    margin-right: 0.5rem;
+}
+
+/* Card image caps */
+.card-img-top {
+    height: 180px;
+    object-fit: cover;
+    background-color: #f8f9fa;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--dark) !important;
+    color: var(--light) !important;
+  }
+  .navbar, .footer {
+    background-color: var(--dark) !important;
+  }
+  .card, .feature-card {
+    background-color: var(--primary-dark) !important;
+    color: var(--light) !important;
+  }
+  .table, .table th, .table td {
+    background-color: var(--primary-dark) !important;
+    color: var(--light) !important;
+  }
+  .table th {
+    background-color: var(--dark) !important;
+  }
+  .btn-primary {
+    background-color: var(--primary-light) !important;
+    border-color: var(--primary-light) !important;
+  }
+  .btn-primary:hover {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+  }
+  audio {
+    background-color: var(--primary-dark) !important;
+  }
+  .form-control, .form-select {
+    background-color: var(--primary-dark) !important;
+    color: var(--light) !important;
+    border-color: var(--secondary) !important;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: var(--secondary-light) !important;
+    box-shadow: 0 0 0 0.2rem rgba(163,141,84,0.25) !important;
+  }
+  .dropdown-menu {
+    background-color: var(--primary-dark) !important;
+    color: var(--light) !important;
+  }
+  .dropdown-item {
+    color: var(--light) !important;
+  }
+  .dropdown-item:hover, .dropdown-item:focus {
+    background-color: var(--primary) !important;
+    color: var(--light) !important;
+  }
+  .alert {
+    background-color: var(--secondary-dark) !important;
+    color: var(--light) !important;
+  }
+  .breadcrumb {
+    background-color: var(--primary-dark) !important;
+  }
+  .progress {
+    background-color: var(--secondary-dark) !important;
+  }
+  .progress-bar {
+    background-color: var(--primary-light) !important;
+  }
+}

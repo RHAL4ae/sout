@@ -95,5 +95,5 @@
 ## الاتصال والدعم
 
 لأي استفسارات أو دعم فني، يرجى التواصل عبر:
-- البريد الإلكتروني: [email@example.com](mailto:email@example.com)
-- القضايا: [GitHub Issues](https://github.com/yourusername/MilitaryMusicAI/issues)
+- البريد الإلكتروني: [h@rhal.ae](mailto:h@rhal.ae)
+- القضايا: [GitHub Issues](https://github.com/RHAL4ae/sout/issues)
